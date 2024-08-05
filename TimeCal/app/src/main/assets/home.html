@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Adder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+          background: url("img/asf.jpg") fixed center;
+          background-repeat: no-repeat;
+          background-size: cover;
+            color: #e0e0e0; /* Light text color for contrast */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1e1e1eaf; /* Darker background for container */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 60px;
+        }
+
+        h3 {
+            text-align: center;
+            color: #ffffff; /* White color for heading */
+        }
+
+        .date-display {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #c0c0c0; /* Light gray color for date */
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+
+        input[type="number"] {
+            width: 80%;
+            margin: auto;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #444; /* Granite-like border color */
+            background-color: #333; /* Dark input background */
+            color: #ffffff; /* Light text color for inputs */
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        select {
+            width: 30%;
+            margin: auto;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #444; /* Granite-like border color */
+            background-color: #333; /* Dark input background */
+            color: #ffffff; /* Light text color for inputs */
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        button[type='submit'] {
+            width: 60%;
+            padding: 10px;
+            background-color: #6c757d; /* Granite color for button */
+            color: #ffffff;
+            border: none;
+            margin-left: 20%;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #5a6268;
+             /* Darker granite color for hover effect */
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #2c2c2c; /* Slightly lighter dark background for result */
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+            font-size: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 80%;
+                padding: 15px;
+                height: 80%;
+            }
+
+            input[type="number"] {
+                font-size: 12px;
+                height: 10px;
+            }
+            option{
+                height: 10px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+
+            .result {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h3>Time Adder</h3>
+    <div class="date-display" id="currentDate"></div>
+    <form onsubmit="addTimes(); return false;">
+        <div class="input-group">
+            <label for="hours1">First Time</label>
+            <input type="number" id="hours1" placeholder="Hours" min="1" max="12" aria-label="First Time Hours">
+            <input type="number" id="minutes1" placeholder="Minutes" min="0" max="59" aria-label="First Time Minutes">
+            <input type="number" id="seconds1" placeholder="Seconds" min="0" max="59" aria-label="First Time Seconds">
+            <select id="ampm1">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="hours2">Second Time</label>
+            <input type="number" id="hours2" placeholder="Hours" min="1" max="12" aria-label="Second Time Hours">
+            <input type="number" id="minutes2" placeholder="Minutes" min="0" max="59" aria-label="Second Time Minutes">
+            <input type="number" id="seconds2" placeholder="Seconds" min="0" max="59" aria-label="Second Time Seconds">
+            <select id="ampm2">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select>
+        </div>
+        <button type="submit">Add Times</button>
+        <div id="result" class="result"></div>
+    </form>
+</div>
+
+<div class="navbar">
+    &copy; 2024 Sarath Astrology Service. All rights reserved.
+</div>
+
+<script>
+        // Function to format the current date
+        function formatDate(date) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString(undefined, options);
+        }
+
+        // Display the current date
+        document.getElementById('currentDate').innerText = `Today is ${formatDate(new Date())}`;
+
+        // Function to convert 12-hour time to 24-hour time
+        function convertTo24Hour(hour, ampm) {
+            if (ampm === "PM" && hour < 12) {
+                return hour + 12;
+            } else if (ampm === "AM" && hour === 12) {
+                return 0;
+            }
+            return hour;
+        }
+
+        function convertTo12Hour(hour) {
+            let ampm = hour >= 12 ? "PM" : "AM";
+            hour = hour % 12;
+            hour = hour ? hour : 12; // the hour '0' should be '12'
+            return { hour, ampm };
+        }
+
+        function addTimes() {
+            // Retrieve values from input fields
+            let hours1 = parseInt(document.getElementById('hours1').value) || 0;
+            const minutes1 = parseInt(document.getElementById('minutes1').value) || 0;
+            const seconds1 = parseInt(document.getElementById('seconds1').value) || 0;
+            const ampm1 = document.getElementById('ampm1').value;
+
+            let hours2 = parseInt(document.getElementById('hours2').value) || 0;
+            const minutes2 = parseInt(document.getElementById('minutes2').value) || 0;
+            const seconds2 = parseInt(document.getElementById('seconds2').value) || 0;
+            const ampm2 = document.getElementById('ampm2').value;
+
+            // Convert to 24-hour format
+            hours1 = convertTo24Hour(hours1, ampm1);
+            hours2 = convertTo24Hour(hours2, ampm2);
+
+            // Convert times to total seconds
+            const totalSeconds1 = hours1 * 3600 + minutes1 * 60 + seconds1;
+            const totalSeconds2 = hours2 * 3600 + minutes2 * 60 + seconds2;
+
+            // Add the seconds
+            const totalSeconds = totalSeconds1 + totalSeconds2;
+
+            // Convert back to hours, minutes, and seconds
+            const resultDays = Math.floor(totalSeconds / 86400); // Number of days
+            let resultHours = Math.floor((totalSeconds % 86400) / 3600); // Remaining hours
+            const resultMinutes = Math.floor((totalSeconds % 3600) / 60);
+            const resultSeconds = totalSeconds % 60;
+
+            // Convert result hours back to 12-hour format
+            const { hour: finalHour, ampm } = convertTo12Hour(resultHours);
+
+            // Display the result
+            document.getElementById('result').innerText =
+                `Total Time: ${resultDays} days ${finalHour} hours ${resultMinutes} minutes and ${resultSeconds} seconds ${ampm}`;
+        }
+    </script>
+</body>
+</html>
